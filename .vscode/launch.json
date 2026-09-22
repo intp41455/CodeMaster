@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🚀 一键启动预览",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "server.ts"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "pattern": "CodeMaster Server running on http://0.0.0.0:3000",
+        "uriFormat": "http://localhost:3000",
+        "action": "openExternally"
+      }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "浏览器预览（3000）",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "调试Node后端",
+      "program": "${workspaceFolder}/server.ts",
+      "outFiles": ["${workspaceFolder}/**/*.js"],
+      "runtimeArgs": ["-r", "tsx"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

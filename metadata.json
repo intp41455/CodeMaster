@@ -1,0 +1,8 @@
+{
+  "name": "Remix CodeMaster - 零基础到开源架构师与AI编程全栈实战学院",
+  "description": "面向零基础的交互式编程学院，系统覆盖Python、Java、Linux系统运维、数据结构、SQL、FastAPI、Spring Boot、Spring AI、Agent与多Agent，包含每日代码挑战打卡、GitHub陌生开源项目5步拆解法实战与AI Vibe Coding代码驾驭力训练。",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
