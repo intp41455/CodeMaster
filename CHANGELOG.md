@@ -43,6 +43,17 @@
 
 - 移除无关的平台元数据文件与模板残留。
 
+## [1.1.0] - 2026-09-23
+
+### 新增
+
+- 前端沙箱化：Python 改用 Pyodide（WASM）在浏览器内执行，JS/TS 用 Web Worker + TS 转译，SQL 用 SQLite WASM，Bash 用前端模拟器。实现零后端依赖，纯静态部署即可运行全部实操。
+- BYOK（自带 AI 模型）：用户在设置面板填入 OpenAI 兼容的 baseURL + API Key + 模型名，即可驱动智能助教/讲解/审评。密钥仅存用户浏览器，不出站。支持 OpenAI / Gemini / DeepSeek / 通义 / 智谱 / Moonshot / Ollama / OpenRouter / Groq 等厂商。
+- 账号体系与进度云同步：Supabase Auth 邮箱登录/注册，profiles 表 RLS 保护，登录后进度自动合并与云端同步。
+- 会员内容后端化架构：premium_content 表 + premium_catalog 公开视图 + RLS 会员鉴权。高级课程内容由云端按会员身份分发，非会员无法抓包获取。含 3 门种子课程（大模型部署与微调、多智能体系统架构、企业级 AI 架构设计），见 `docs/supabase-premium-seed.sql`。
+- TypeScript 沙箱修复：`.mjs` 扩展名改为 `.ts`（Node 22+ 默认启用类型剥离），带类型注解的 TS 代码可正常执行。
+- SQL 模拟输出对齐课程内容，Linux 模拟器补 `cd` / `mkdir -p` / `cat` 分支。
+
 ## [0.0.0] - 2026-09-22
 
 内部初始版本，完成平台主体功能搭建。
