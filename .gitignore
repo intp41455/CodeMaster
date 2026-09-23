@@ -6,3 +6,21 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# 编辑器与 IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# 构建缓存与临时产物
+*.tsbuildinfo
+.vite/
+.temp/
+.tmp/
+codemaster-sandbox/
+
+# 包管理器
+.npm/
+.pnpm-store/
+yarn-error.log

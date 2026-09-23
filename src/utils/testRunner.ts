@@ -7,6 +7,7 @@ import { TRACKS_DATA } from "../data/coursesData";
 import { DAILY_CHALLENGES } from "../data/dailyChallengesData";
 import { GITHUB_LAB_PROJECTS } from "../data/githubLabData";
 import { VIBE_CODING_CASES } from "../data/vibeCodingLabData";
+import { QUIZ_QUESTIONS, CODE_PUZZLES } from "../data/gameArenaData";
 import { auditCodeLocally } from "./codeAuditEngine";
 
 export interface TestSuiteResult {
@@ -257,6 +258,104 @@ function processUser(data: UserData): boolean {
     failedTests: suite3Failed,
     bugsCaught: suite3Bugs,
     durationMs: Date.now() - suite3Start
+  });
+
+  // ==========================================
+  // SUITE 4: 游戏化训练区题库完整性与可判定性测试
+  // ==========================================
+  const suite4Start = Date.now();
+  let suite4Passed = 0;
+  let suite4Failed = 0;
+  const suite4Bugs: any[] = [];
+
+  // 选择题：必须恰好一个正确答案，且每个选项都要有解析，否则玩家无法学到东西
+  const seenQuestionIds = new Set<string>();
+  QUIZ_QUESTIONS.forEach((q) => {
+    const problems: string[] = [];
+
+    if (seenQuestionIds.has(q.id)) {
+      problems.push("题目 id 重复");
+    }
+    seenQuestionIds.add(q.id);
+
+    if (!q.question || q.question.trim().length === 0) {
+      problems.push("题干为空");
+    }
+
+    const options = q.options || [];
+    if (options.length < 3) {
+      problems.push(`选项少于 3 个（当前 ${options.length} 个）`);
+    }
+
+    const correctCount = options.filter((o) => o.isCorrect).length;
+    if (correctCount !== 1) {
+      problems.push(`正确答案数量为 ${correctCount}，应为 1`);
+    }
+
+    options.forEach((o) => {
+      if (!o.explanation || o.explanation.trim().length < 5) {
+        problems.push(`选项 ${o.id} 缺少有效解析`);
+      }
+    });
+
+    if (problems.length === 0) {
+      suite4Passed++;
+    } else {
+      suite4Failed++;
+      suite4Bugs.push({
+        target: `游戏题库选择题: ${q.id}`,
+        description: problems.join("；"),
+        details: q.question
+      });
+    }
+  });
+
+  // 代码排序题：顺序必须唯一可判定，因此不允许空行与重复行
+  const seenPuzzleIds = new Set<string>();
+  CODE_PUZZLES.forEach((p) => {
+    const problems: string[] = [];
+
+    if (seenPuzzleIds.has(p.id)) {
+      problems.push("题目 id 重复");
+    }
+    seenPuzzleIds.add(p.id);
+
+    const order = p.correctOrder || [];
+    if (order.length < 3) {
+      problems.push(`正确顺序少于 3 行（当前 ${order.length} 行）`);
+    }
+    if (new Set(order).size !== order.length) {
+      problems.push("存在重复代码行，排序结果无法判定唯一解");
+    }
+    if (order.some((line) => line.trim().length === 0)) {
+      problems.push("存在空行，会破坏排序判定");
+    }
+    if (!p.hint || p.hint.trim().length < 5) {
+      problems.push("缺少有效提示");
+    }
+    if (!p.explanation || p.explanation.trim().length < 10) {
+      problems.push("缺少有效解析");
+    }
+
+    if (problems.length === 0) {
+      suite4Passed++;
+    } else {
+      suite4Failed++;
+      suite4Bugs.push({
+        target: `游戏题库排序题: ${p.id}`,
+        description: problems.join("；"),
+        details: p.title
+      });
+    }
+  });
+
+  suites.push({
+    suiteName: "4. 游戏化训练区题库完整性与可判定性测试",
+    totalTests: suite4Passed + suite4Failed,
+    passedTests: suite4Passed,
+    failedTests: suite4Failed,
+    bugsCaught: suite4Bugs,
+    durationMs: Date.now() - suite4Start
   });
 
   const totalPassed = suites.reduce((acc, s) => acc + s.passedTests, 0);

@@ -7,7 +7,8 @@ import {
   Award, 
   Sparkles, 
   Bot, 
-  Flame
+  Flame,
+  Gamepad2
 } from "lucide-react";
 import { NavTab, UserProgress } from "../types";
 
@@ -30,25 +31,25 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-40 w-full border-b border-[rgba(26,26,26,0.08)] bg-[#f8f7f4]/95 backdrop-blur-md">
       <div className="mx-auto flex h-[60px] w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo & Name */}
-        <div className="flex items-center gap-6">
+        <div className="flex min-w-0 items-center gap-4">
           <div 
             onClick={() => setActiveTab("curriculum")}
-            className="flex cursor-pointer items-center gap-2 group"
+            className="flex shrink-0 cursor-pointer items-center gap-2 group"
           >
-            <span className="font-['Cormorant_Garamond',serif] text-[1.8rem] font-semibold tracking-tight text-[#1a1a1a] select-none">
+            <span className="font-['Cormorant_Garamond',serif] text-[1.5rem] font-semibold tracking-tight text-[#1a1a1a] select-none">
               CodeMaster
             </span>
-            <span className="hidden sm:inline-block font-['Geist_Mono',monospace] text-[0.65rem] uppercase tracking-wider text-[rgba(26,26,26,0.45)] border-l border-[rgba(26,26,26,0.12)] pl-2">
+            <span className="hidden xl:inline-block font-['Geist_Mono',monospace] text-[0.65rem] uppercase tracking-wider text-[rgba(26,26,26,0.45)] border-l border-[rgba(26,26,26,0.12)] pl-2">
               System View
             </span>
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="hidden md:flex items-center gap-4 lg:gap-6 ml-2">
+          <nav className="hidden min-w-0 md:flex items-center gap-3 lg:gap-4 ml-1">
             <button
               id="nav-tab-curriculum"
               onClick={() => setActiveTab("curriculum")}
-              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 ${
+              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === "curriculum"
                   ? "text-[#2563eb] font-semibold border-b-2 border-[#2563eb]"
                   : "text-[rgba(26,26,26,0.5)] hover:text-[#1a1a1a]"
@@ -61,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-tab-github-lab"
               onClick={() => setActiveTab("github-lab")}
-              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 ${
+              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === "github-lab"
                   ? "text-[#2563eb] font-semibold border-b-2 border-[#2563eb]"
                   : "text-[rgba(26,26,26,0.5)] hover:text-[#1a1a1a]"
@@ -74,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-tab-vibe-coding"
               onClick={() => setActiveTab("vibe-coding")}
-              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 ${
+              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === "vibe-coding"
                   ? "text-[#2563eb] font-semibold border-b-2 border-[#2563eb]"
                   : "text-[rgba(26,26,26,0.5)] hover:text-[#1a1a1a]"
@@ -87,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="nav-tab-code-audit"
               onClick={() => setActiveTab("code-audit")}
-              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 ${
+              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === "code-audit"
                   ? "text-[#2563eb] font-semibold border-b-2 border-[#2563eb]"
                   : "text-[rgba(26,26,26,0.5)] hover:text-[#1a1a1a]"
@@ -98,9 +99,22 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             <button
+              id="nav-tab-game-arena"
+              onClick={() => setActiveTab("game-arena")}
+              className={`text-[0.75rem] uppercase tracking-[0.05em] transition-colors py-1 flex items-center gap-1.5 whitespace-nowrap ${
+                activeTab === "game-arena"
+                  ? "text-[#2563eb] font-semibold border-b-2 border-[#2563eb]"
+                  : "text-[rgba(26,26,26,0.5)] hover:text-[#1a1a1a]"
+              }`}
+            >
+              <Gamepad2 className="h-3.5 w-3.5" />
+              <span>Game Zone</span>
+            </button>
+
+            <button
               id="nav-tab-capstone"
               onClick={onOpenCapstone}
-              className="text-[0.75rem] uppercase tracking-[0.05em] text-purple-700 hover:text-purple-900 font-medium py-1 flex items-center gap-1.5 transition-colors"
+              className="text-[0.75rem] uppercase tracking-[0.05em] text-purple-700 hover:text-purple-900 font-medium py-1 flex items-center gap-1.5 whitespace-nowrap transition-colors"
             >
               <Award className="h-3.5 w-3.5 text-purple-600" />
               <span>Final Project</span>
@@ -109,13 +123,19 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right Session, XP, & AI Tutor */}
-        <div className="flex items-center gap-3 sm:gap-6">
-          <span className="hidden sm:inline font-['Geist_Mono',monospace] text-[0.65rem] uppercase tracking-wider text-[rgba(26,26,26,0.5)]">
-            Session: {progress.currentStreakDays} Days Streak
+        <div className="flex shrink-0 items-center gap-2.5 sm:gap-4 pl-3">
+          <span
+            title={`连续学习 ${progress.currentStreakDays} 天`}
+            className="hidden whitespace-nowrap font-['Geist_Mono',monospace] text-[0.65rem] uppercase tracking-wider text-[rgba(26,26,26,0.5)] lg:inline"
+          >
+            {progress.currentStreakDays}D STREAK
           </span>
 
-          <span className="hidden sm:inline font-['Geist_Mono',monospace] text-[0.65rem] uppercase tracking-wider text-[rgba(26,26,26,0.5)]">
-            Progress: {progress.xp} XP
+          <span
+            title={`累计经验值 ${progress.xp}`}
+            className="hidden whitespace-nowrap font-['Geist_Mono',monospace] text-[0.65rem] uppercase tracking-wider text-[rgba(26,26,26,0.5)] sm:inline"
+          >
+            {progress.xp} XP
           </span>
 
           <button
@@ -154,6 +174,12 @@ export const Header: React.FC<HeaderProps> = ({
           className={`shrink-0 px-2 py-1 ${activeTab === "code-audit" ? "text-[#2563eb] font-semibold" : "text-[rgba(26,26,26,0.5)]"}`}
         >
           Audit System
+        </button>
+        <button
+          onClick={() => setActiveTab("game-arena")}
+          className={`shrink-0 px-2 py-1 ${activeTab === "game-arena" ? "text-[#2563eb] font-semibold" : "text-[rgba(26,26,26,0.5)]"}`}
+        >
+          Game Zone
         </button>
         <button
           onClick={onOpenCapstone}

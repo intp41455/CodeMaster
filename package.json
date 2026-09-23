@@ -1,7 +1,10 @@
 {
-  "name": "react-example",
+  "name": "codemaster-academy",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "CodeMaster —— 零基础到开源架构师的交互式全栈实战学院",
+  "license": "MIT",
+  "author": "intp41455",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",

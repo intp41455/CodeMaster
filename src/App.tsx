@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useEffect } from "react";
 import { Header } from "./components/Header";
 import { TrackSelector } from "./components/TrackSelector";
@@ -10,6 +5,7 @@ import { CodecademyWorkspace } from "./components/CodecademyWorkspace";
 import { GitHubDeconstructionLab } from "./components/GitHubDeconstructionLab";
 import { VibeCodingControlRoom } from "./components/VibeCodingControlRoom";
 import { CodeAuditAndTestCenter } from "./components/CodeAuditAndTestCenter";
+import { GameZone } from "./components/GameZone";
 import { GraduationCapstoneModal } from "./components/GraduationCapstoneModal";
 import { DailyChallengeModal } from "./components/DailyChallengeModal";
 import { TrackEnterpriseProjectModal } from "./components/TrackEnterpriseProjectModal";
@@ -176,6 +172,12 @@ export default function App() {
     });
   };
 
+  // 游戏化训练区获得经验值
+  const handleEarnXpFromGame = (xp: number) => {
+    if (!Number.isFinite(xp) || xp <= 0) return;
+    setProgress((prev) => ({ ...prev, xp: prev.xp + Math.round(xp) }));
+  };
+
   return (
     <div className="min-h-screen bg-[#f8f7f4] text-[#1a1a1a] flex flex-col font-['Geist',sans-serif]">
       {/* Global Header */}
@@ -290,6 +292,11 @@ export default function App() {
           <CodeAuditAndTestCenter
             onBackToCurriculum={() => setActiveTab("curriculum")}
           />
+        )}
+
+        {/* Tab 5: 游戏化训练区 */}
+        {activeTab === "game-arena" && (
+          <GameZone onEarnXp={handleEarnXpFromGame} />
         )}
       </main>
 

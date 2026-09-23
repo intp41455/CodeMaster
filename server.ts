@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import os from "os";
 import { execFile } from "child_process";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
@@ -16,9 +17,97 @@ import {
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+// 端口可通过环境变量覆盖，便于本地多实例调试与云平台自动注入
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: "5mb" }));
+
+// ============================================================
+// 代码沙箱运行时基础设施（跨平台）
+// ============================================================
+
+/**
+ * 跨平台沙箱临时目录。
+ *
+ * 注意：Windows 上并不存在 /tmp。若写成 path.join("/tmp", name)，
+ * Node 会解析为当前盘符根目录下的 \tmp\，该目录默认不存在，
+ * 会导致 fs.writeFileSync 抛出 ENOENT，代码运行功能整体失效。
+ * 因此统一使用操作系统的标准临时目录。
+ */
+const SANDBOX_TMP_DIR = (() => {
+  const dir = path.join(os.tmpdir(), "codemaster-sandbox");
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+    return dir;
+  } catch (_) {
+    // 极端情况下无法创建子目录，退回系统临时目录本身
+    return os.tmpdir();
+  }
+})();
+
+/**
+ * 沙箱子进程环境变量：剔除服务端敏感凭据，
+ * 避免学习者提交的代码通过 os.environ / process.env 读取到密钥。
+ */
+const SANDBOX_ENV = {
+  ...process.env,
+  GEMINI_API_KEY: "",
+  APP_URL: "",
+};
+
+/**
+ * Python 解释器命令探测（结果缓存）。
+ * Windows 官方安装包提供的是 python.exe / py.exe，
+ * macOS 与 Linux 普遍使用 python3，因此按平台决定探测优先级。
+ */
+const PYTHON_CANDIDATES =
+  process.platform === "win32" ? ["python", "py", "python3"] : ["python3", "python"];
+
+let cachedPythonCommand: string | null | undefined;
+
+function resolvePythonCommand(): Promise<string | null> {
+  if (cachedPythonCommand !== undefined) {
+    return Promise.resolve(cachedPythonCommand);
+  }
+  return new Promise((resolve) => {
+    let index = 0;
+    const probeNext = () => {
+      if (index >= PYTHON_CANDIDATES.length) {
+        cachedPythonCommand = null;
+        return resolve(null);
+      }
+      const candidate = PYTHON_CANDIDATES[index++];
+      execFile(candidate, ["-V"], { timeout: 5000 }, (err) => {
+        if (err) {
+          return probeNext();
+        }
+        cachedPythonCommand = candidate;
+        resolve(candidate);
+      });
+    };
+    probeNext();
+  });
+}
+
+/**
+ * 把运行时错误信息中的沙箱临时路径替换为友好的文件名。
+ * 使用字符串替换而非 new RegExp()：Windows 路径包含反斜杠与盘符冒号，
+ * 直接构造正则表达式会触发转义错误与匹配失败。
+ */
+function scrubSandboxPath(text: string, tmpFilePath: string, friendlyName: string): string {
+  const variants = [
+    tmpFilePath,
+    tmpFilePath.replace(/\\/g, "/"),
+    path.basename(tmpFilePath),
+  ];
+  let output = text;
+  for (const variant of variants) {
+    if (variant) {
+      output = output.split(variant).join(friendlyName);
+    }
+  }
+  return output;
+}
 
 // State tracking for Gemini API availability
 let geminiAccessDenied = false;
@@ -29,13 +118,13 @@ function getGeminiClient(): GoogleGenAI | null {
     return null;
   }
   if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (apiKey && apiKey !== "MY_GEMINI_API_KEY" && apiKey.trim().length > 0) {
+    const apiKey = (process.env.GEMINI_API_KEY || "").trim();
+    if (apiKey.length > 0) {
       aiClient = new GoogleGenAI({
         apiKey,
         httpOptions: {
           headers: {
-            'User-Agent': 'aistudio-build',
+            'User-Agent': 'codemaster-academy',
           }
         }
       });
@@ -56,11 +145,11 @@ async function probeGeminiConnection(): Promise<void> {
       model: "gemini-3.8-flash",
       contents: "ping",
     });
-    console.log("[AI Engine] Cloud Gemini API connected successfully.");
+    console.log("[Tutor Engine] Cloud Gemini API connected successfully.");
   } catch (error: any) {
     geminiAccessDenied = true;
     aiClient = null;
-    console.log("[AI Engine] Local intelligent tutor and static analysis engine active.");
+    console.log("[Tutor Engine] Local intelligent tutor and static analysis engine active.");
   }
 }
 
@@ -78,9 +167,9 @@ function handleGeminiError(error: any, context: string): void {
   if (isPermissionOrAuthError) {
     geminiAccessDenied = true;
     aiClient = null;
-    console.log(`[AI Engine] ${context}: Activated intelligent local engine.`);
+    console.log(`[Tutor Engine] ${context}: Activated intelligent local engine.`);
   } else {
-    console.log(`[AI Engine] ${context}: Transient AI service issue. Served intelligent fallback.`);
+    console.log(`[Tutor Engine] ${context}: Transient AI service issue. Served intelligent fallback.`);
   }
 }
 
@@ -325,17 +414,32 @@ app.post("/api/run-code", async (req, res) => {
 
     // 2. Python 真实本地沙箱运行
     if (language === "python") {
+      const pythonCommand = await resolvePythonCommand();
+
+      // 环境中没有可用的 Python 解释器时，给出明确的排障指引
+      if (!pythonCommand) {
+        return res.json({
+          status: "error",
+          output:
+            "⚠️ [环境检测失败]: 当前系统中未找到可用的 Python 解释器。\n" +
+            "请先安装 Python 3（安装时务必勾选 “Add Python to PATH”），安装完成后重启本服务再试。\n" +
+            `已尝试的命令: ${PYTHON_CANDIDATES.join(", ")}`,
+          executionTimeMs: Date.now() - startTime,
+          timestamp: new Date().toISOString()
+        });
+      }
+
       // 临时沙箱文件安全写入与执行
       const tmpId = Math.random().toString(36).substring(2, 9);
-      const tmpFilePath = path.join("/tmp", `user_script_${tmpId}.py`);
+      const tmpFilePath = path.join(SANDBOX_TMP_DIR, `user_script_${tmpId}.py`);
 
       try {
         fs.writeFileSync(tmpFilePath, rawCode, "utf8");
 
         execFile(
-          "python3",
+          pythonCommand,
           [tmpFilePath],
-          { timeout: 3500, maxBuffer: 1024 * 512 },
+          { cwd: SANDBOX_TMP_DIR, env: SANDBOX_ENV, timeout: 3500, maxBuffer: 1024 * 512 },
           (error, stdout, stderr) => {
             // 清理临时文件
             try {
@@ -348,7 +452,7 @@ app.post("/api/run-code", async (req, res) => {
               // 包含超时或者真实的 SyntaxError, NameError, IndentationError, TypeError
               let errOutput = stderr ? stderr.trim() : error.message;
               // 净化临时文件路径为友好的 main.py
-              errOutput = errOutput.replace(new RegExp(tmpFilePath, "g"), 'main.py');
+              errOutput = scrubSandboxPath(errOutput, tmpFilePath, "main.py");
               if (error.killed) {
                 errOutput = `⏱️ [执行超时熔断]: 运行超过 3.5 秒！可能触发了死循环或无限等待。\n请检查循环退出条件 (如 while 或 for)。`;
               }
@@ -387,16 +491,18 @@ app.post("/api/run-code", async (req, res) => {
     // 3. TypeScript / JavaScript 真实本地 Node 沙箱执行
     if (language === "typescript" || language === "ts" || language === "javascript" || language === "js") {
       const tmpId = Math.random().toString(36).substring(2, 9);
-      const tmpFilePath = path.join("/tmp", `user_script_${tmpId}.mjs`);
+      const tmpFilePath = path.join(SANDBOX_TMP_DIR, `user_script_${tmpId}.mjs`);
 
       try {
         // 将纯 TS 代码或 JS 代码写入（Node 22 原生支持很多语法）
         fs.writeFileSync(tmpFilePath, rawCode, "utf8");
 
         execFile(
-          "node",
+          // process.execPath 指向当前正在运行的 Node 可执行文件，
+          // 比直接依赖 PATH 上的 "node" 更可靠（尤其 Windows）。
+          process.execPath,
           [tmpFilePath],
-          { timeout: 3500, maxBuffer: 1024 * 512 },
+          { cwd: SANDBOX_TMP_DIR, env: SANDBOX_ENV, timeout: 3500, maxBuffer: 1024 * 512 },
           (error, stdout, stderr) => {
             try {
               if (fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath);
@@ -406,7 +512,7 @@ app.post("/api/run-code", async (req, res) => {
 
             if (error) {
               let errOutput = stderr ? stderr.trim() : error.message;
-              errOutput = errOutput.replace(new RegExp(tmpFilePath, "g"), 'main.ts');
+              errOutput = scrubSandboxPath(errOutput, tmpFilePath, "main.mjs");
               if (error.killed) {
                 errOutput = `⏱️ [执行超时熔断]: 运行超过 3.5 秒！可能触发了死循环。`;
               }

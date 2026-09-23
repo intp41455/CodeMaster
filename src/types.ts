@@ -18,6 +18,7 @@ export type NavTab =
   | "github-lab" 
   | "vibe-coding" 
   | "code-audit"
+  | "game-arena"
   | "capstone";
 
 export interface Checkpoint {
