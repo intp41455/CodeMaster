@@ -9,7 +9,8 @@ import {
   Bot, 
   Flame,
   Gamepad2,
-  KeyRound
+  KeyRound,
+  UserRound
 } from "lucide-react";
 import { NavTab, UserProgress } from "../types";
 
@@ -20,6 +21,8 @@ interface HeaderProps {
   onOpenAITutor: () => void;
   onOpenCapstone: () => void;
   onOpenAISettings?: () => void;
+  authUser?: { id: string; email?: string } | null;
+  onOpenAuth?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -29,6 +32,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAITutor,
   onOpenCapstone,
   onOpenAISettings,
+  authUser,
+  onOpenAuth,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[rgba(26,26,26,0.08)] bg-[#f8f7f4]/95 backdrop-blur-md">
@@ -140,6 +145,16 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {progress.xp} XP
           </span>
+
+          <button
+            id="open-auth-btn"
+            onClick={onOpenAuth}
+            title={authUser ? `账号：${authUser.email || ""}（点击管理）` : "登录 / 注册，开启云端进度同步"}
+            className="inline-flex h-8 max-w-[130px] items-center gap-1.5 rounded-full border border-[rgba(26,26,26,0.15)] bg-white px-3 text-[0.65rem] font-['Geist_Mono',monospace] uppercase tracking-wider text-[rgba(26,26,26,0.6)] hover:text-[#1a1a1a] hover:bg-neutral-100 transition-all active:scale-95"
+          >
+            <UserRound className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{authUser ? (authUser.email || "账号") : "登录"}</span>
+          </button>
 
           <button
             id="open-ai-settings-btn"

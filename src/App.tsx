@@ -11,6 +11,13 @@ import { DailyChallengeModal } from "./components/DailyChallengeModal";
 import { TrackEnterpriseProjectModal } from "./components/TrackEnterpriseProjectModal";
 import { AITutorDrawer } from "./components/AITutorDrawer";
 import { AISettingsPanel } from "./components/AISettingsPanel";
+import AuthModal from "./components/AuthModal";
+import {
+  onAuthChange,
+  getCurrentUser,
+  loadProgressFromCloud,
+  syncProgressToCloud,
+} from "./utils/progressSync";
 import { TRACKS_DATA } from "./data/coursesData";
 import { getTodayChallenge } from "./data/dailyChallengesData";
 import { NavTab, LearningTrackId, UserProgress, TrackInfo } from "./types";
@@ -74,6 +81,49 @@ export default function App() {
       // ignore
     }
   }, [progress]);
+
+  // ---- 云端账号与进度同步（Supabase，未配置时自动降级为纯本地）----
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [authUser, setAuthUser] = useState<{ id: string; email?: string } | null>(null);
+
+  // 启动时恢复登录态（getCurrentUser 为异步）
+  useEffect(() => {
+    getCurrentUser().then(setAuthUser);
+  }, []);
+
+  const mergeProgressCloudLocal = (cloud: UserProgress, local: UserProgress): UserProgress => ({
+    ...local,
+    completedLessonIds: Array.from(new Set([...(cloud.completedLessonIds || []), ...(local.completedLessonIds || [])])),
+    completedGitHubLabIds: Array.from(new Set([...(cloud.completedGitHubLabIds || []), ...(local.completedGitHubLabIds || [])])),
+    completedVibeCases: Array.from(new Set([...(cloud.completedVibeCases || []), ...(local.completedVibeCases || [])])),
+    completedDailyChallengeIds: Array.from(new Set([...(cloud.completedDailyChallengeIds || []), ...(local.completedDailyChallengeIds || [])])),
+    completedTrackProjectIds: Array.from(new Set([...(cloud.completedTrackProjectIds || []), ...(local.completedTrackProjectIds || [])])),
+    unlockedBadges: Array.from(new Set([...(cloud.unlockedBadges || []), ...(local.unlockedBadges || [])])),
+    xp: Math.max(cloud.xp ?? 0, local.xp ?? 0),
+    currentStreakDays: Math.max(cloud.currentStreakDays ?? 0, local.currentStreakDays ?? 0),
+    capstonePassed: Boolean(cloud.capstonePassed || local.capstonePassed),
+  });
+
+  // 登录/登出监听：登录后拉取云端进度并合并
+  useEffect(() => {
+    onAuthChange((user) => {
+      setAuthUser(user);
+      if (user) {
+        loadProgressFromCloud().then((cloud) => {
+          if (cloud) setProgress((prev) => mergeProgressCloudLocal(cloud, prev));
+        });
+      }
+    });
+  }, []);
+
+  // 进度变化防抖上传云端
+  useEffect(() => {
+    if (!authUser) return;
+    const t = setTimeout(() => {
+      syncProgressToCloud(progress);
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [progress, authUser]);
 
   const currentTrack = TRACKS_DATA.find((t) => t.id === activeTrackId) || TRACKS_DATA[0];
   const currentLesson =
@@ -196,10 +246,20 @@ export default function App() {
         onOpenAITutor={() => setShowAITutor(true)}
         onOpenCapstone={() => setShowCapstoneModal(true)}
         onOpenAISettings={() => setShowAISettings(true)}
+        authUser={authUser}
+        onOpenAuth={() => setShowAuthModal(true)}
       />
 
       {/* AI 连接设置面板 */}
       <AISettingsPanel open={showAISettings} onClose={() => setShowAISettings(false)} />
+
+      {/* 账号 / 登录弹窗 */}
+      <AuthModal
+        open={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        user={authUser}
+        onUserChange={() => getCurrentUser().then(setAuthUser)}
+      />
 
       {/* Main Container */}
       <main className="flex-1 w-full">

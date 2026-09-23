@@ -24,3 +24,6 @@ codemaster-sandbox/
 .npm/
 .pnpm-store/
 yarn-error.log
+
+# EdgeOne Makers 部署缓存（含构建产物与项目链接，勿提交）
+.edgeone/
