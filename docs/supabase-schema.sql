@@ -60,3 +60,49 @@ create or replace view public.my_membership as
 select id, is_member, membership_until
 from public.profiles
 where id = auth.uid();
+
+-- ============================================================
+-- 高级板块：付费内容存储与鉴权分发（会员内容后端化）
+-- 免费课程数据仍在前端 bundle；高级课程内容存此表，仅会员可读。
+-- ============================================================
+
+create table if not exists public.premium_content (
+  id            text primary key,
+  title         text not null,
+  tagline       text,
+  description   text,
+  lessons       jsonb not null default '[]'::jsonb,
+  is_published  boolean not null default true,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now()
+);
+
+comment on table public.premium_content is 'CodeMaster 高级板块课程（仅会员可读）';
+
+-- RLS：非会员读不到任何内容（含课程详情）
+alter table public.premium_content enable row level security;
+
+drop policy if exists "premium_select_members_only" on public.premium_content;
+create policy "premium_select_members_only"
+  on public.premium_content for select
+  using (
+    exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid()
+        and p.is_member = true
+        and (p.membership_until is null or p.membership_until > now())
+    )
+  );
+
+-- 内容写入仅限服务端（service_role）；anon/authenticated 均无写权限
+revoke insert, update, delete on public.premium_content from anon, authenticated;
+grant select on public.premium_content to authenticated;
+
+-- 公开目录视图：只有标题/简介（非会员可见，用于展示与转化），无课程正文
+drop view if exists public.premium_catalog;
+create view public.premium_catalog as
+select id, title, tagline, description
+from public.premium_content
+where is_published = true;
+
+grant select on public.premium_catalog to anon, authenticated;

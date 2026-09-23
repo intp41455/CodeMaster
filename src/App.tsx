@@ -12,6 +12,7 @@ import { TrackEnterpriseProjectModal } from "./components/TrackEnterpriseProject
 import { AITutorDrawer } from "./components/AITutorDrawer";
 import { AISettingsPanel } from "./components/AISettingsPanel";
 import AuthModal from "./components/AuthModal";
+import PremiumSection from "./components/PremiumSection";
 import {
   onAuthChange,
   getCurrentUser,
@@ -291,6 +292,7 @@ export default function App() {
                   onOpenDailyChallenge={() => setShowDailyChallengeModal(true)}
                   onOpenEnterpriseProject={(t) => setSelectedEnterpriseTrack(t)}
                 />
+                <PremiumSection onOpenAuth={() => setShowAuthModal(true)} />
               </div>
             ) : (
               <div>
