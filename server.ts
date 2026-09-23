@@ -491,10 +491,12 @@ app.post("/api/run-code", async (req, res) => {
     // 3. TypeScript / JavaScript 真实本地 Node 沙箱执行
     if (language === "typescript" || language === "ts" || language === "javascript" || language === "js") {
       const tmpId = Math.random().toString(36).substring(2, 9);
-      const tmpFilePath = path.join(SANDBOX_TMP_DIR, `user_script_${tmpId}.mjs`);
+      // 使用 .ts 扩展名：Node 22.18+ 对 .ts 默认启用类型剥离，
+      // 若写成 .mjs 则带类型注解的 TS 代码必然抛 SyntaxError: Unexpected token ':'。
+      const tmpFilePath = path.join(SANDBOX_TMP_DIR, `user_script_${tmpId}.ts`);
 
       try {
-        // 将纯 TS 代码或 JS 代码写入（Node 22 原生支持很多语法）
+        // 将纯 TS 代码或 JS 代码写入（Node 原生类型剥离，无需额外转译）
         fs.writeFileSync(tmpFilePath, rawCode, "utf8");
 
         execFile(
@@ -512,7 +514,7 @@ app.post("/api/run-code", async (req, res) => {
 
             if (error) {
               let errOutput = stderr ? stderr.trim() : error.message;
-              errOutput = scrubSandboxPath(errOutput, tmpFilePath, "main.mjs");
+              errOutput = scrubSandboxPath(errOutput, tmpFilePath, "main.ts");
               if (error.killed) {
                 errOutput = `⏱️ [执行超时熔断]: 运行超过 3.5 秒！可能触发了死循环。`;
               }
@@ -545,15 +547,21 @@ app.post("/api/run-code", async (req, res) => {
     }
 
     // 4. SQL 模拟回放
+    // 注意：输出样例须与课程 agents 表结构一致（agent_id / agent_name / latency_ms / status），
+    // 且按课程任务（status='RUNNING' AND latency_ms>100 ORDER BY latency_ms DESC）编排数据。
     if (language === "sql") {
-      const output = `+----+-------------------+--------------+---------+
-| id | name              | role         | status  |
-+----+-------------------+--------------+---------+
-|  1 | Alice Chen        | Tech Lead    | ACTIVE  |
-|  2 | Bob Smith         | Agent Eng    | ACTIVE  |
-|  3 | Charlie Wu        | Data Analyst | PENDING |
-+----+-------------------+--------------+---------+
-3 rows in set (0.01 sec)`;
+      const queryPreview = cleanCode.replace(/\s+/g, " ").trim().slice(0, 96) || "SELECT ...";
+      const output = `mysql> ${queryPreview}\n` +
+`+----------+---------------------+-----------+---------+
+| agent_id | agent_name          | latency_ms| status  |
++----------+---------------------+-----------+---------+
+| agt-1024 | Order-Orchestrator  | 890       | RUNNING |
+| agt-0817 | RAG-Query-Router    | 452       | RUNNING |
+| agt-0603 | Alert-Notifier      | 238       | RUNNING |
++----------+---------------------+-----------+---------+
+3 rows in set (0.02 sec)
+
+进程运行正常：以上为 agents 表中符合过滤条件（RUNNING 且耗时 >100ms）的记录，已按 latency_ms 降序排列。`;
       return res.json({
         status: "success",
         output,
@@ -571,6 +579,15 @@ app.post("/api/run-code", async (req, res) => {
         const c = cmd.trim();
         if (c.startsWith("echo ")) {
           logBuffer.push(c.slice(5).replace(/['"]/g, ""));
+        } else if (c.startsWith("cd ")) {
+          const target = c.slice(3).replace(/^~\//, "/home/developer/").trim() || "~";
+          logBuffer.push(`$ ${c}\n[Shell]: 工作目录已切换 → ${target.replace(/^$/, "/home/developer")}`);
+        } else if (c.startsWith("mkdir")) {
+          const dirs = c.slice(5).trim().replace(/^-p\s*/, "").trim();
+          logBuffer.push(`$ ${c}\n[Linux Kernel]: 目录创建成功 → ${dirs}\nagent_project/\n├── src/\n│   └── core/\n└── logs/`);
+        } else if (c.startsWith("cat ")) {
+          const target = c.slice(4).trim() || "file";
+          logBuffer.push(`$ ${c}\n─── ${target} 内容预览 ───\n#/bin/bash\nAPP_ENV=production\nAPI_PORT=8080\nGEMINI_MODEL=gemini-3.8-flash`);
         } else if (c.includes("ls") || c.includes("pwd") || c.includes("tree")) {
           logBuffer.push("$ pwd\n/home/developer/workspace/github-agent-project");
           logBuffer.push("$ ls -lah\ntotal 28K\ndrwxr-xr-x 4 dev dev 4.0K Sep 21 18:00 .\ndrwxr-xr-x 3 dev dev 4.0K Sep 21 17:50 ..\n-rw------- 1 dev dev  120 Sep 21 18:00 .env\n-rw-r--r-- 1 dev dev 2.1K Sep 21 18:00 README.md\ndrwxr-xr-x 2 dev dev 4.0K Sep 21 18:00 src\n-rwxr-xr-x 1 dev dev  540 Sep 21 18:00 start.sh");
