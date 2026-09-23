@@ -21,7 +21,8 @@ import {
   Flame
 } from "lucide-react";
 import { Lesson, TrackInfo } from "../types";
-import { generateIntelligentExplanation } from "../utils/aiFallbackEngine";
+import { runCodeInSandbox } from "../utils/sandbox";
+import { askExplain } from "../utils/aiGateway";
 import { InteractiveComputerAnatomy } from "./InteractiveComputerAnatomy";
 import { InteractiveVariablePlayground } from "./InteractiveVariablePlayground";
 import { InteractiveCodeExecutionLab } from "./InteractiveCodeExecutionLab";
@@ -115,15 +116,8 @@ export const CodecademyWorkspace: React.FC<CodecademyWorkspaceProps> = ({
       setTraceSteps(steps);
       setCurrentStepIndex(steps.length > 0 ? steps.length - 1 : 0);
 
-      const response = await fetch("/api/run-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code,
-          language: lesson.language,
-        }),
-      });
-      const data = await response.json();
+      // 首选浏览器内沙箱（Pyodide / Worker / SQLite WASM），后端仅作本地兜底
+      const data = await runCodeInSandbox(code, lesson.language);
       const outputText = data.output || "";
       setOutput(outputText);
       setExecutionTime(data.executionTimeMs ?? 15);
@@ -223,25 +217,12 @@ export const CodecademyWorkspace: React.FC<CodecademyWorkspaceProps> = ({
     setIsExplaining(true);
     setActiveRightTab("ai-explain");
     try {
-      const res = await fetch("/api/gemini/explain", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code,
-          language: lesson.language,
-          question: `请用最通俗直观的话拆解这段关于【${lesson.title}】的代码。`,
-        }),
-      });
-      const data = await res.json();
-      if (data && data.explanation) {
-        setAiExplanation(data.explanation);
-      } else {
-        const local = generateIntelligentExplanation(code, lesson.language, undefined, `请拆解【${lesson.title}】代码`);
-        setAiExplanation(local.explanation);
-      }
-    } catch (e: any) {
-      const local = generateIntelligentExplanation(code, lesson.language, undefined, `请拆解【${lesson.title}】代码`);
-      setAiExplanation(local.explanation);
+      const explanation = await askExplain(
+        code,
+        lesson.language,
+        `请用最通俗直观的话拆解这段关于【${lesson.title}】的代码。`
+      );
+      setAiExplanation(explanation);
     } finally {
       setIsExplaining(false);
     }

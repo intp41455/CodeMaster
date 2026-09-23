@@ -8,7 +8,8 @@ import {
   Sparkles, 
   Bot, 
   Flame,
-  Gamepad2
+  Gamepad2,
+  KeyRound
 } from "lucide-react";
 import { NavTab, UserProgress } from "../types";
 
@@ -18,6 +19,7 @@ interface HeaderProps {
   progress: UserProgress;
   onOpenAITutor: () => void;
   onOpenCapstone: () => void;
+  onOpenAISettings?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -26,6 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
   progress,
   onOpenAITutor,
   onOpenCapstone,
+  onOpenAISettings,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[rgba(26,26,26,0.08)] bg-[#f8f7f4]/95 backdrop-blur-md">
@@ -137,6 +140,15 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {progress.xp} XP
           </span>
+
+          <button
+            id="open-ai-settings-btn"
+            onClick={onOpenAISettings}
+            title="AI 连接设置（自带 Key）"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(26,26,26,0.15)] bg-white text-[rgba(26,26,26,0.6)] hover:text-[#1a1a1a] hover:bg-neutral-100 transition-all active:scale-95"
+          >
+            <KeyRound className="h-3.5 w-3.5" />
+          </button>
 
           <button
             id="open-ai-tutor-btn"

@@ -588,13 +588,13 @@ app.post("/api/run-code", async (req, res) => {
         } else if (c.startsWith("cat ")) {
           const target = c.slice(4).trim() || "file";
           logBuffer.push(`$ ${c}\n─── ${target} 内容预览 ───\n#/bin/bash\nAPP_ENV=production\nAPI_PORT=8080\nGEMINI_MODEL=gemini-3.8-flash`);
-        } else if (c.includes("ls") || c.includes("pwd") || c.includes("tree")) {
+        } else if (c.includes("lsof") || c.includes("netstat")) {
+          logBuffer.push(`$ ${c}\nCOMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME\npython  4092  dev    4u  IPv4  32014      0t0  TCP *:8080 (LISTEN)`);
+        } else if (c === "ls" || c.startsWith("ls ") || c.includes("pwd") || c.includes("tree")) {
           logBuffer.push("$ pwd\n/home/developer/workspace/github-agent-project");
           logBuffer.push("$ ls -lah\ntotal 28K\ndrwxr-xr-x 4 dev dev 4.0K Sep 21 18:00 .\ndrwxr-xr-x 3 dev dev 4.0K Sep 21 17:50 ..\n-rw------- 1 dev dev  120 Sep 21 18:00 .env\n-rw-r--r-- 1 dev dev 2.1K Sep 21 18:00 README.md\ndrwxr-xr-x 2 dev dev 4.0K Sep 21 18:00 src\n-rwxr-xr-x 1 dev dev  540 Sep 21 18:00 start.sh");
         } else if (c.includes("chmod")) {
           logBuffer.push(`$ ${c}\n[Linux Kernel]: 权限已更新 -> -rwxr-xr-x (文件属性已赋予可执行权限)`);
-        } else if (c.includes("lsof") || c.includes("netstat")) {
-          logBuffer.push(`$ ${c}\nCOMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME\npython  4092  dev    4u  IPv4  32014      0t0  TCP *:8080 (LISTEN)`);
         } else if (c.includes("kill")) {
           logBuffer.push(`$ ${c}\n[SIGKILL 9 发送成功]: 进程 4092 已被终止，端口 8080 已成功释放。`);
         } else if (c.includes("export")) {

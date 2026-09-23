@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { VIBE_CODING_CASES } from "../data/vibeCodingLabData";
 import { VibeCodingCase } from "../types";
-import { generateIntelligentReview } from "../utils/aiFallbackEngine";
+import { askReview } from "../utils/aiGateway";
 
 interface VibeCodingControlRoomProps {
   onCompleteCase: (caseId: string) => void;
@@ -51,29 +51,14 @@ export const VibeCodingControlRoom: React.FC<VibeCodingControlRoomProps> = ({
     }
   };
 
-  // Trigger Gemini Deep Audit
+  // Trigger AI Deep Audit (BYOK > 后端 > 本地引擎)
   const handleRequestGeminiAudit = async () => {
     setIsReviewing(true);
     try {
-      const res = await fetch("/api/gemini/review", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: userCode,
-          language: currentCase.language,
-          intent: currentCase.aiPromptUsed,
-        }),
-      });
-      const data = await res.json();
-      if (data && data.review) {
-        setAiReviewOutput(data.review);
-      } else {
-        const local = generateIntelligentReview(userCode, currentCase.language, currentCase.aiPromptUsed);
-        setAiReviewOutput(local.review);
-      }
+      const review = await askReview(userCode, currentCase.language, currentCase.aiPromptUsed);
+      setAiReviewOutput(review);
     } catch (e: any) {
-      const local = generateIntelligentReview(userCode, currentCase.language, currentCase.aiPromptUsed);
-      setAiReviewOutput(local.review);
+      setAiReviewOutput(`（AI 审评服务暂时不可用，请稍后再试：${e?.message || e}`.slice(0, 200) + "）");
     } finally {
       setIsReviewing(false);
     }

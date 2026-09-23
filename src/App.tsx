@@ -10,6 +10,7 @@ import { GraduationCapstoneModal } from "./components/GraduationCapstoneModal";
 import { DailyChallengeModal } from "./components/DailyChallengeModal";
 import { TrackEnterpriseProjectModal } from "./components/TrackEnterpriseProjectModal";
 import { AITutorDrawer } from "./components/AITutorDrawer";
+import { AISettingsPanel } from "./components/AISettingsPanel";
 import { TRACKS_DATA } from "./data/coursesData";
 import { getTodayChallenge } from "./data/dailyChallengesData";
 import { NavTab, LearningTrackId, UserProgress, TrackInfo } from "./types";
@@ -178,6 +179,8 @@ export default function App() {
     setProgress((prev) => ({ ...prev, xp: prev.xp + Math.round(xp) }));
   };
 
+  const [showAISettings, setShowAISettings] = useState<boolean>(false);
+
   return (
     <div className="min-h-screen bg-[#f8f7f4] text-[#1a1a1a] flex flex-col font-['Geist',sans-serif]">
       {/* Global Header */}
@@ -192,7 +195,11 @@ export default function App() {
         progress={progress}
         onOpenAITutor={() => setShowAITutor(true)}
         onOpenCapstone={() => setShowCapstoneModal(true)}
+        onOpenAISettings={() => setShowAISettings(true)}
       />
+
+      {/* AI 连接设置面板 */}
+      <AISettingsPanel open={showAISettings} onClose={() => setShowAISettings(false)} />
 
       {/* Main Container */}
       <main className="flex-1 w-full">

@@ -11,7 +11,8 @@ import {
   Terminal,
   ChevronRight
 } from "lucide-react";
-import { generateIntelligentTutorReply } from "../utils/aiFallbackEngine";
+import { askTutor } from "../utils/aiGateway";
+import { currentModelLabel } from "../utils/llmClient";
 
 interface Message {
   role: "user" | "assistant";
@@ -72,39 +73,28 @@ export const AITutorDrawer: React.FC<AITutorDrawerProps> = ({
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/gemini/tutor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: newMessages,
-          currentTopic: currentLessonTitle,
-          currentTrack: currentTrackTitle,
-          currentCode: currentCode,
-        }),
+      const reply = await askTutor(newMessages, {
+        topic: currentLessonTitle,
+        track: currentTrackTitle,
+        code: currentCode,
       });
-      const data = await res.json();
-      if (data && data.reply) {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: data.reply },
-        ]);
-      } else {
-        const local = generateIntelligentTutorReply(newMessages, currentLessonTitle, currentTrackTitle, currentCode);
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: local.reply },
-        ]);
-      }
-    } catch (err: any) {
-      const local = generateIntelligentTutorReply(newMessages, currentLessonTitle, currentTrackTitle, currentCode);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: local.reply },
+        { role: "assistant", content: reply },
+      ]);
+    } catch (err: any) {
+      const queried = [...newMessages];
+      const lastContent = queried[queried.length - 1]?.content || "你好";
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: `（AI 服务暂时不可用，请稍后再试。\n您可以先手动学习当前课程内容。）\n\n刚才的问题是：${lastContent.slice(0, 120)}` },
       ]);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const modelLabel = currentModelLabel();
 
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] border-l border-[rgba(26,26,26,0.08)] bg-white shadow-2xl flex flex-col text-[#1a1a1a] animate-slideInRight font-['Geist',sans-serif]">
@@ -116,11 +106,11 @@ export const AITutorDrawer: React.FC<AITutorDrawerProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-semibold text-sm text-[#1a1a1a]">AI 伴读导师 (Gemini 驱动)</span>
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+              <span className="font-semibold text-sm text-[#1a1a1a]">AI 伴读导师</span>
+              <span className={`flex h-2 w-2 rounded-full animate-ping ${modelLabel ? "bg-emerald-500" : "bg-amber-500"}`} />
             </div>
             <p className="text-[11px] text-[rgba(26,26,26,0.5)]">
-              当前上下文：{currentLessonTitle || "全栈与AI编程实战"}
+              {modelLabel ? `驱动模型：${modelLabel}` : "内置本地引擎 · 点右上角钥匙图标可接入你的 AI Key"}
             </p>
           </div>
         </div>
