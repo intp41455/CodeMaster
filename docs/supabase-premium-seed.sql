@@ -1,11 +1,11 @@
 -- ============================================================
 -- CodeMaster 高级板块：建表 + RLS + 种子数据
 -- 
-// 使用方法：
-// 1. 打开 Supabase Dashboard → SQL Editor
-// 2. 粘贴此文件全部内容 → Run
-// 3. 完成后 premium_catalog 视图和 premium_content 表即可用
-// ============================================================
+-- 使用方法：
+-- 1. 打开 Supabase Dashboard → SQL Editor
+-- 2. 粘贴此文件全部内容 → Run
+-- 3. 完成后 premium_catalog 视图和 premium_content 表即可用
+-- ============================================================
 
 -- 1. 建表（幂等，重复执行不报错）
 create table if not exists public.premium_content (
