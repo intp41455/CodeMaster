@@ -120,4 +120,4 @@ on conflict (id) do update set
   updated_at = now();
 
 -- 6. 验证查询（执行后应看到 3 行）
-select id, title, tagline from public.premium_catalog order by created_at;
+select id, title, tagline from public.premium_catalog order by id;
