@@ -10,6 +10,15 @@
 
 let pyodideSingleton: Promise<any> | null = null;
 
+/**
+ * Pyodide 静态资源目录：跟随 Vite 的 base 自适应，绝不硬编码根路径。
+ *   - 根路径部署（Cloudflare Pages / 本地 / EdgeOne 根）  → "/pyodide/"
+ *   - 子路径部署（GitHub Pages /gode/，Actions 设 base=/gode/）→ "/gode/pyodide/"
+ * 历史上硬编码 "/pyodide/" 导致子路径部署 404 → "Pyodide 运行时加载失败：/pyodide/pyodide.js"。
+ * BASE_URL 保证以 "/" 结尾，直接拼接 "pyodide/"。
+ */
+const PYODIDE_BASE = import.meta.env.BASE_URL + "pyodide/";
+
 declare global {
   interface Window {
     loadPyodide?: (opts: { indexURL: string }) => Promise<any>;
@@ -39,9 +48,9 @@ export async function ensurePyodide(onProgress?: (phase: string, pct: number) =>
   if (!pyodideSingleton) {
     onProgress?.("加载 WASM 运行时", 15);
     pyodideSingleton = (async () => {
-      await loadScript("/pyodide/pyodide.js");
+      await loadScript(PYODIDE_BASE + "pyodide.js");
       onProgress?.("启动 Python 解释器", 45);
-      const py = await window.loadPyodide!({ indexURL: "/pyodide/" });
+      const py = await window.loadPyodide!({ indexURL: PYODIDE_BASE });
       onProgress?.("就绪", 100);
       return py;
     })();
