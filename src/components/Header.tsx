@@ -13,9 +13,12 @@ import {
   UserRound,
   ExternalLink,
   Sun,
-  Moon
+  Moon,
+  Star
 } from "lucide-react";
 import { NavTab, UserProgress } from "../types";
+import { StarUnlockModal } from "./StarUnlockModal";
+import { isStarUnlocked } from "../utils/starUnlock";
 
 interface HeaderProps {
   activeTab: NavTab;
@@ -66,6 +69,32 @@ export const Header: React.FC<HeaderProps> = ({
       return next;
     });
   };
+
+  // ---- Star 权益解锁（自包含：本地状态 + localStorage，见 utils/starUnlock.ts）----
+  const [showStarModal, setShowStarModal] = useState<boolean>(false);
+  const [starUnlocked, setStarUnlocked] = useState<boolean>(() => {
+    try {
+      return isStarUnlocked();
+    } catch {
+      return false;
+    }
+  });
+
+  const starButton = (extraClass = "") => (
+    <button
+      id="star-unlock-btn"
+      onClick={() => setShowStarModal(true)}
+      aria-label={starUnlocked ? "高级板块已解锁（Star 权益）" : "点 Star 免费解锁高级板块"}
+      title={starUnlocked ? "高级板块已解锁（Star 权益）" : "点 Star 免费解锁高级板块"}
+      className={`inline-flex h-8 w-8 items-center justify-center rounded-full border transition-all active:scale-95 ${extraClass} ${
+        starUnlocked
+          ? "border-[#f5b301] bg-[rgba(245,179,1,0.12)] text-[#f5b301]"
+          : "border-[rgba(26,26,26,0.15)] bg-white text-[rgba(26,26,26,0.6)] hover:text-[#1a1a1a] hover:bg-neutral-100"
+      }`}
+    >
+      <Star className={`h-3.5 w-3.5 ${starUnlocked ? "fill-current" : ""}`} />
+    </button>
+  );
 
   const themeButton = (extraClass = "") => (
     <button
@@ -220,6 +249,8 @@ export const Header: React.FC<HeaderProps> = ({
             <KeyRound className="h-3.5 w-3.5" />
           </button>
 
+          {starButton()}
+
           {themeButton()}
 
           <button
@@ -281,8 +312,16 @@ export const Header: React.FC<HeaderProps> = ({
           <ExternalLink className="h-3 w-3" />
           入门 · 循码
         </a>
+        {starButton("h-7 w-7")}
         {themeButton("h-7 w-7")}
       </div>
+
+      {/* Star 权益解锁弹窗 */}
+      <StarUnlockModal
+        open={showStarModal}
+        onClose={() => setShowStarModal(false)}
+        onUnlockedChange={() => setStarUnlocked(isStarUnlocked())}
+      />
     </header>
   );
 };
