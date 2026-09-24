@@ -22,6 +22,165 @@
     --ink-dim: rgba(230, 232, 238, 0.55);
     --paper: #1a1d24;
     --terminal-bg: #0d0f14;
+
+    /* ===== Override Tailwind v4 color CSS variables directly in dark mode =====
+       This is the ROOT FIX: Tailwind v4 compiles .text-neutral-400 to
+       color:var(--color-neutral-400). Overriding the variable itself means
+       every utility using it flips automatically — no per-class !important needed.
+       Gray shades 300-500 are the "secondary/helper text" that was invisible. */
+    --color-neutral-300: #a0a0b0;
+    --color-neutral-400: #8b8b9a;
+    --color-neutral-500: #9ca3af;
+    --color-neutral-600: #a8acb8;
+    --color-neutral-700: #b8bcc8;
+    --color-neutral-800: #d4d8e0;
+    --color-neutral-900: #e8eaf0;
+
+    --color-gray-300: #a0a0b0;
+    --color-gray-400: #8b8b9a;
+    --color-gray-500: #9ca3af;
+    --color-gray-600: #a8acb8;
+    --color-gray-700: #b8bcc8;
+    --color-gray-800: #d4d8e0;
+    --color-gray-900: #e8eaf0;
+
+    --color-slate-300: #94a3b8;
+    --color-slate-400: #8b95a8;
+    --color-slate-500: #94a3b8;
+    --color-slate-600: #a8b0c0;
+    --color-slate-700: #b8c0d0;
+    --color-slate-800: #d4dce8;
+    --color-slate-900: #e8ecf4;
+
+    --color-zinc-300: #a0a0aa;
+    --color-zinc-400: #8b8b95;
+    --color-zinc-500: #9c9ca6;
+    --color-zinc-600: #a8a8b2;
+    --color-zinc-700: #b8b8c2;
+    --color-zinc-800: #d4d4de;
+    --color-zinc-900: #e8e8f0;
+
+    --color-stone-300: #a0a09a;
+    --color-stone-400: #8b8b85;
+    --color-stone-500: #9c9c96;
+    --color-stone-600: #a8a8a2;
+    --color-stone-700: #b8b8b2;
+    --color-stone-800: #d4d4ce;
+    --color-stone-900: #e8e8e2;
+
+    /* Colored text families — dark shades also need to flip to light */
+    --color-blue-600: #93c5fd;
+    --color-blue-700: #bfdbfe;
+    --color-blue-800: #dbeafe;
+    --color-blue-900: #eff6ff;
+
+    --color-emerald-600: #6ee7b7;
+    --color-emerald-700: #a7f3d0;
+    --color-emerald-800: #d1fae5;
+    --color-emerald-900: #ecfdf5;
+
+    --color-amber-600: #fcd34d;
+    --color-amber-700: #fde68a;
+    --color-amber-800: #fef3c7;
+    --color-amber-900: #fffbeb;
+
+    --color-rose-600: #fca5a5;
+    --color-rose-700: #fecaca;
+    --color-rose-800: #fee2e2;
+    --color-rose-900: #fff1f2;
+
+    --color-red-600: #fca5a5;
+    --color-red-700: #fecaca;
+    --color-red-800: #fee2e2;
+    --color-red-900: #fff1f2;
+
+    --color-purple-600: #c4b5fd;
+    --color-purple-700: #ddd6fe;
+    --color-purple-800: #ede9fe;
+    --color-purple-900: #faf5ff;
+
+    --color-cyan-600: #67e8f9;
+    --color-cyan-700: #a5f3fc;
+
+    --color-indigo-600: #a5b4fc;
+    --color-indigo-700: #c7d2fe;
+
+    --color-sky-600: #7dd3fc;
+    --color-sky-700: #bae6fd;
+
+    --color-green-600: #86efac;
+    --color-green-700: #bbf7d0;
+    --color-green-800: #dcfce7;
+    --color-green-900: #f0fdf4;
+
+    --color-teal-600: #5eead4;
+    --color-teal-700: #99f6e4;
+
+    --color-orange-600: #fdba74;
+    --color-orange-700: #fcd34d;
+
+    --color-yellow-600: #fde047;
+    --color-yellow-700: #fef08a;
+
+    /* Light backgrounds → dark (these are used by bg-*-50/100/200 utilities) */
+    --color-neutral-50: #1a1d24;
+    --color-neutral-100: #22262f;
+    --color-neutral-200: #2b313c;
+
+    --color-gray-50: #1a1d24;
+    --color-gray-100: #22262f;
+    --color-gray-200: #2b313c;
+
+    --color-slate-50: #1a1d24;
+    --color-slate-100: #22262f;
+    --color-slate-200: #2b313c;
+
+    --color-zinc-50: #1a1d24;
+    --color-zinc-100: #22262f;
+    --color-zinc-200: #2b313c;
+
+    --color-stone-50: #1a1d24;
+    --color-stone-100: #22262f;
+    --color-stone-200: #2b313c;
+
+    --color-blue-50: #1a2b45;
+    --color-blue-100: #243a5f;
+
+    --color-emerald-50: #0f2a1f;
+    --color-emerald-100: #143a2a;
+
+    --color-amber-50: #2a2310;
+    --color-amber-100: #3a2e14;
+
+    --color-rose-50: #2a1416;
+    --color-rose-100: #3a1a1d;
+
+    --color-red-50: #2a1416;
+    --color-red-100: #3a1a1d;
+
+    --color-purple-50: #1f1733;
+    --color-purple-100: #2a1f44;
+
+    --color-cyan-50: #0f2a2c;
+    --color-cyan-100: #143a3a;
+
+    --color-indigo-50: #1a1733;
+    --color-indigo-100: #231f44;
+
+    --color-sky-50: #0f2230;
+    --color-sky-100: #142e3e;
+
+    --color-green-50: #122a1a;
+    --color-green-100: #163a22;
+
+    --color-teal-50: #0f2a2a;
+    --color-teal-100: #143a3a;
+
+    --color-orange-50: #2a1c12;
+    --color-orange-100: #3a2416;
+
+    --color-yellow-50: #2a2710;
+    --color-yellow-100: #3a3314;
   }
 
   body {
