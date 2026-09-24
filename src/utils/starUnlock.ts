@@ -1,6 +1,6 @@
 /* CodeMaster (gode) · Star 权益解锁（零依赖，纯前端校验）
  * ============================================================
- * 机制：在 GitHub 仓库 intp41455/gode 点了 star 的用户，在 issue 留言 GitHub 用户名，
+ * 机制：在 GitHub 仓库 intp41455/CodeMaster 点了 star 的用户，在 issue 留言 GitHub 用户名，
  *      由运营侧用 tools/gen-code.py --repo gode 生成解锁码发给用户，
  *      用户在站内输入即解锁「高级板块 · 会员专属」。
  *
@@ -17,10 +17,10 @@
  */
 
 /** gode 仓库地址（领取步骤里展示给用户） */
-export const GODE_REPO_URL = "https://github.com/intp41455/gode";
+export const GODE_REPO_URL = "https://github.com/intp41455/CodeMaster";
 /** 领取解锁码的 issue 预填链接 */
 export const GODE_ISSUE_URL =
-  "https://github.com/intp41455/gode/issues/new?title=" +
+  "https://github.com/intp41455/CodeMaster/issues/new?title=" +
   encodeURIComponent("领取 Star 解锁码") +
   "&body=" +
   encodeURIComponent("我的 GitHub 用户名是：（填在这里，我会发解锁码给你）\n\n感谢支持 🙏");
