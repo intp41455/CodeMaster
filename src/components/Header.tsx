@@ -1,16 +1,17 @@
 import React from "react";
-import { 
-  BookOpen, 
-  GitBranch, 
-  ShieldAlert, 
+import {
+  BookOpen,
+  GitBranch,
+  ShieldAlert,
   ShieldCheck,
-  Award, 
-  Sparkles, 
-  Bot, 
+  Award,
+  Sparkles,
+  Bot,
   Flame,
   Gamepad2,
   KeyRound,
-  UserRound
+  UserRound,
+  ExternalLink
 } from "lucide-react";
 import { NavTab, UserProgress } from "../types";
 
@@ -127,6 +128,17 @@ export const Header: React.FC<HeaderProps> = ({
               <Award className="h-3.5 w-3.5 text-purple-600" />
               <span>Final Project</span>
             </button>
+
+            <a
+              href="https://codepath-academy.pages.dev/"
+              target="_blank"
+              rel="noreferrer"
+              title="从零开始学编程：循码 Codepath 免费入门练习场（浏览器真跑代码）"
+              className="text-[0.75rem] uppercase tracking-[0.05em] text-[rgba(26,26,26,0.45)] hover:text-[#2563eb] py-1 flex items-center gap-1.5 whitespace-nowrap transition-colors"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              <span>入门 · 循码</span>
+            </a>
           </nav>
         </div>
 
@@ -214,6 +226,16 @@ export const Header: React.FC<HeaderProps> = ({
         >
           Final Project
         </button>
+        <a
+          href="https://codepath-academy.pages.dev/"
+          target="_blank"
+          rel="noreferrer"
+          title="从零开始学编程：循码 Codepath 免费入门练习场"
+          className="shrink-0 px-2 py-1 text-[rgba(26,26,26,0.5)] hover:text-[#2563eb] flex items-center gap-1 transition-colors"
+        >
+          <ExternalLink className="h-3 w-3" />
+          入门 · 循码
+        </a>
       </div>
     </header>
   );
