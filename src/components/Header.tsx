@@ -12,8 +12,6 @@ import {
   KeyRound,
   UserRound,
   ExternalLink,
-  Sun,
-  Moon,
   Star
 } from "lucide-react";
 import { NavTab, UserProgress } from "../types";
@@ -41,34 +39,11 @@ export const Header: React.FC<HeaderProps> = ({
   authUser,
   onOpenAuth,
 }) => {
-  // ---- Day / Night mode toggle (self-contained: manages <html data-theme> + localStorage) ----
-  const [themeMode, setThemeMode] = useState<"light" | "dark">(() => {
-    try {
-      const saved = localStorage.getItem("gode-theme");
-      if (saved === "light" || saved === "dark") return saved;
-      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
-      return "light";
-    } catch {
-      return "light";
-    }
-  });
-
+  // ---- Theme: force light mode (dark mode disabled due to readability issues) ----
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", themeMode);
-  }, [themeMode]);
-
-  const toggleTheme = () => {
-    setThemeMode((prev) => {
-      const next = prev === "light" ? "dark" : "light";
-      document.documentElement.setAttribute("data-theme", next);
-      try {
-        localStorage.setItem("gode-theme", next);
-      } catch {
-        /* ignore storage errors */
-      }
-      return next;
-    });
-  };
+    document.documentElement.setAttribute("data-theme", "light");
+    try { localStorage.setItem("gode-theme", "light"); } catch { /* ignore */ }
+  }, []);
 
   // ---- Star 权益解锁（自包含：本地状态 + localStorage，见 utils/starUnlock.ts）----
   const [showStarModal, setShowStarModal] = useState<boolean>(false);
@@ -96,17 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
     </button>
   );
 
-  const themeButton = (extraClass = "") => (
-    <button
-      id="theme-toggle-btn"
-      onClick={toggleTheme}
-      aria-label={themeMode === "light" ? "切换到夜间模式" : "切换到日间模式"}
-      title={themeMode === "light" ? "切换到夜间模式" : "切换到日间模式"}
-      className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(26,26,26,0.15)] bg-white text-[rgba(26,26,26,0.6)] hover:text-[#1a1a1a] hover:bg-neutral-100 transition-all active:scale-95 ${extraClass}`}
-    >
-      {themeMode === "light" ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
-    </button>
-  );
+  // themeButton removed — dark mode disabled
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[rgba(26,26,26,0.08)] bg-[#f8f7f4]/95 backdrop-blur-md">
@@ -251,8 +216,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           {starButton()}
 
-          {themeButton()}
-
           <button
             id="open-ai-tutor-btn"
             onClick={onOpenAITutor}
@@ -313,7 +276,6 @@ export const Header: React.FC<HeaderProps> = ({
           入门 · 循码
         </a>
         {starButton("h-7 w-7")}
-        {themeButton("h-7 w-7")}
       </div>
 
       {/* Star 权益解锁弹窗 */}
