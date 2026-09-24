@@ -2,6 +2,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --bg: #f8f7f4;
     --ink: #1a1a1a;
     --accent: #2563eb;
@@ -11,12 +12,91 @@
     --terminal-bg: #f1f5f9;
   }
 
+  /* Night mode palette. Driven by <html data-theme="dark">. */
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1115;
+    --ink: #e6e8ee;
+    --accent: #4f8cff;
+    --ink-faint: rgba(230, 232, 238, 0.12);
+    --ink-dim: rgba(230, 232, 238, 0.55);
+    --paper: #1a1d24;
+    --terminal-bg: #0d0f14;
+  }
+
   body {
     background-color: var(--bg);
     color: var(--ink);
     font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /*
+   * Night-mode surface overrides.
+   * The app is styled with literal Tailwind utilities (bg-white / bg-[#f8f7f4] /
+   * text-[#1a1a1a] / bg-neutral-*), so the variables above alone would not flip
+   * those. These scoped, cosmetic-only rules re-theme those surfaces in dark mode.
+   * They are purely visual (no layout/logic), leave light mode untouched, and are
+   * intentionally !important so they beat the utility layer.
+   */
+  [data-theme="dark"] body {
+    background-color: #0f1115;
+  }
+  [data-theme="dark"] .bg-white,
+  [data-theme="dark"] .bg-\[\#f8f7f4\] {
+    background-color: #1a1d24 !important;
+  }
+  [data-theme="dark"] .bg-neutral-50 {
+    background-color: #22262f !important;
+  }
+  [data-theme="dark"] .bg-neutral-100 {
+    background-color: #262a34 !important;
+  }
+  [data-theme="dark"] .bg-neutral-200 {
+    background-color: #333947 !important;
+  }
+  [data-theme="dark"] .bg-blue-50 {
+    background-color: #1a2b45 !important;
+  }
+  [data-theme="dark"] .bg-blue-100 {
+    background-color: #243a5f !important;
+  }
+  [data-theme="dark"] .text-\[\#1a1a1a\] {
+    color: #e6e8ee !important;
+  }
+  [data-theme="dark"] .hover\:text-\[\#1a1a1a\]:hover {
+    color: #e6e8ee !important;
+  }
+  /* rgba(26,26,26,α) "ink family" — text */
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.3\)\] { color: rgba(230,232,238,0.4) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.35\)\] { color: rgba(230,232,238,0.45) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.4\)\] { color: rgba(230,232,238,0.5) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.45\)\] { color: rgba(230,232,238,0.55) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.5\)\] { color: rgba(230,232,238,0.6) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.55\)\] { color: rgba(230,232,238,0.65) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.6\)\] { color: rgba(230,232,238,0.7) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.65\)\] { color: rgba(230,232,238,0.75) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.7\)\] { color: rgba(230,232,238,0.8) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.75\)\] { color: rgba(230,232,238,0.85) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.8\)\] { color: rgba(230,232,238,0.9) !important; }
+  [data-theme="dark"] .text-\[rgba\(26,26,26,0\.85\)\] { color: rgba(230,232,238,0.95) !important; }
+  /* rgba(26,26,26,α) "ink family" — borders */
+  [data-theme="dark"] .border-\[rgba\(26,26,26,0\.05\)\] { border-color: rgba(230,232,238,0.1) !important; }
+  [data-theme="dark"] .border-\[rgba\(26,26,26,0\.06\)\] { border-color: rgba(230,232,238,0.12) !important; }
+  [data-theme="dark"] .border-\[rgba\(26,26,26,0\.08\)\] { border-color: rgba(230,232,238,0.16) !important; }
+  [data-theme="dark"] .border-\[rgba\(26,26,26,0\.1\)\] { border-color: rgba(230,232,238,0.2) !important; }
+  [data-theme="dark"] .border-\[rgba\(26,26,26,0\.12\)\] { border-color: rgba(230,232,238,0.24) !important; }
+  [data-theme="dark"] .border-\[rgba\(26,26,26,0\.15\)\] { border-color: rgba(230,232,238,0.3) !important; }
+  [data-theme="dark"] .border-\[rgba\(26,26,26,0\.2\)\] { border-color: rgba(230,232,238,0.4) !important; }
+  /* rgba(26,26,26,α) "ink family" — translucent fills */
+  [data-theme="dark"] .bg-\[rgba\(26,26,26,0\.08\)\] { background-color: rgba(230,232,238,0.14) !important; }
+  /* hover fill states */
+  [data-theme="dark"] .hover\:bg-neutral-100:hover {
+    background-color: #262a34 !important;
+  }
+  [data-theme="dark"] .hover\:bg-neutral-200:hover {
+    background-color: #333947 !important;
   }
 }
 
