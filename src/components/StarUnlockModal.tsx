@@ -1,7 +1,7 @@
 /**
  * Star 权益解锁弹窗 —— CodeMaster (gode)
  *
- * 机制：在 GitHub 仓库 intp41455/gode 点了 star 的用户，在 issue 留言 GitHub 用户名，
+ * 机制：在 GitHub 仓库 intp41455/CodeMaster 点了 star 的用户，在 issue 留言 GitHub 用户名，
  *      由运营侧发解锁码，在此输入即解锁「高级板块 · 会员专属」。
  * 校验：纯前端（FNV-1a + 盐），见 utils/starUnlock.ts。
  */
