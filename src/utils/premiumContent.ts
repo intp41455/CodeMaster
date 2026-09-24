@@ -6,6 +6,7 @@
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import type { Lesson } from "../types";
 import { getMembershipStatus } from "./progressSync";
+import { isStarUnlocked } from "./starUnlock";
 
 export interface PremiumCourseMeta {
   id: string;
@@ -58,8 +59,12 @@ export async function getMembership(): Promise<MembershipInfo> {
     return cachedMembership ?? { isMember: false };
   }
   const status = await getMembershipStatus();
-  const result: MembershipInfo = status
-    ? { isMember: status.isMember, until: status.until }
+  // Star 权益：点了仓库 star 并领到解锁码的用户，等同会员，解锁「高级板块」。
+  // 与付费会员取并集——任一条成立即视为会员（Star 为长期有效，无到期时间）。
+  const star = isStarUnlocked();
+  const isMember = Boolean(status?.isMember) || star;
+  const result: MembershipInfo = isMember
+    ? { isMember: true, until: status?.until ?? (star ? "star-lifetime" : undefined) }
     : { isMember: false };
   cachedMembership = result;
   membershipCacheTime = now;
