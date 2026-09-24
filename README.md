@@ -18,7 +18,7 @@ CodeMaster 是纯静态、零后端的项目，没有推广预算，**Star 是�
 所以做了个小交换：
 
 1. 给这个仓库点个 **Star**
-2. 在 [issue](https://github.com/intp41455/gode/issues/new?title=%E9%A2%86%E5%8F%96%20Star%20%E8%A7%A3%E9%94%81%E7%A0%81&body=%E6%88%91%E7%9A%84%20GitHub%20%E7%94%A8%E6%88%B7%E5%90%8D%E6%98%AF%EF%BC%9A%EF%BC%88%E5%A1%AB%E5%9C%A8%E8%BF%99%E9%87%8C%EF%BC%8C%E6%88%91%E4%BC%9A%E5%8F%91%E8%A7%A3%E9%94%81%E7%A0%81%E7%BB%99%E4%BD%A0%EF%BC%89) 留一句你的 GitHub 用户名
+2. 在 [issue](https://github.com/intp41455/CodeMaster/issues/new?title=%E9%A2%86%E5%8F%96%20Star%20%E8%A7%A3%E9%94%81%E7%A0%81&body=%E6%88%91%E7%9A%84%20GitHub%20%E7%94%A8%E6%88%B7%E5%90%8D%E6%98%AF%EF%BC%9A%EF%BC%88%E5%A1%AB%E5%9C%A8%E8%BF%99%E9%87%8C%EF%BC%8C%E6%88%91%E4%BC%9A%E5%8F%91%E8%A7%A3%E9%94%81%E7%A0%81%E7%BB%99%E4%BD%A0%EF%BC%89) 留一句你的 GitHub 用户名
 3. 我发你一个解锁码，在站内右上角 **⭐** 里填进去 —— **高级板块 · 会员专属**全部开放
 
 觉得项目有用再点，觉得没用就路过，都行。
