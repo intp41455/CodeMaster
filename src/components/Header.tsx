@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BookOpen,
   GitBranch,
@@ -11,7 +11,9 @@ import {
   Gamepad2,
   KeyRound,
   UserRound,
-  ExternalLink
+  ExternalLink,
+  Sun,
+  Moon
 } from "lucide-react";
 import { NavTab, UserProgress } from "../types";
 
@@ -36,6 +38,47 @@ export const Header: React.FC<HeaderProps> = ({
   authUser,
   onOpenAuth,
 }) => {
+  // ---- Day / Night mode toggle (self-contained: manages <html data-theme> + localStorage) ----
+  const [themeMode, setThemeMode] = useState<"light" | "dark">(() => {
+    try {
+      const saved = localStorage.getItem("gode-theme");
+      if (saved === "light" || saved === "dark") return saved;
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+      return "light";
+    } catch {
+      return "light";
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", themeMode);
+  }, [themeMode]);
+
+  const toggleTheme = () => {
+    setThemeMode((prev) => {
+      const next = prev === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", next);
+      try {
+        localStorage.setItem("gode-theme", next);
+      } catch {
+        /* ignore storage errors */
+      }
+      return next;
+    });
+  };
+
+  const themeButton = (extraClass = "") => (
+    <button
+      id="theme-toggle-btn"
+      onClick={toggleTheme}
+      aria-label={themeMode === "light" ? "切换到夜间模式" : "切换到日间模式"}
+      title={themeMode === "light" ? "切换到夜间模式" : "切换到日间模式"}
+      className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(26,26,26,0.15)] bg-white text-[rgba(26,26,26,0.6)] hover:text-[#1a1a1a] hover:bg-neutral-100 transition-all active:scale-95 ${extraClass}`}
+    >
+      {themeMode === "light" ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
+    </button>
+  );
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[rgba(26,26,26,0.08)] bg-[#f8f7f4]/95 backdrop-blur-md">
       <div className="mx-auto flex h-[60px] w-full items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -177,6 +220,8 @@ export const Header: React.FC<HeaderProps> = ({
             <KeyRound className="h-3.5 w-3.5" />
           </button>
 
+          {themeButton()}
+
           <button
             id="open-ai-tutor-btn"
             onClick={onOpenAITutor}
@@ -236,6 +281,7 @@ export const Header: React.FC<HeaderProps> = ({
           <ExternalLink className="h-3 w-3" />
           入门 · 循码
         </a>
+        {themeButton("h-7 w-7")}
       </div>
     </header>
   );
