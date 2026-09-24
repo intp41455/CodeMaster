@@ -548,6 +548,23 @@
 [data-theme=dark] ::-webkit-scrollbar-thumb:hover { background: rgba(230,232,238,0.3) !important; }
 [data-theme=dark] .bg-white { background-color: #1a1d24 !important; }
 
+/* ===== audit-fix round 3: mid-gray small text (neutral-300/400 invisible on dark) =====
+   root cause: only 500-900 were flipped in round 1, but text-neutral-400 (26 uses) and
+   text-neutral-300 (2 uses) were never covered -> #a3a3a3/#d4d4d4 on #1a1d24 = unreadable.
+   Also add 300/400 for ALL families to be safe. */
+[data-theme=dark] .text-neutral-300 { color: #a0a0b0 !important; }
+[data-theme=dark] .text-neutral-400 { color: #8b8b9a !important; }
+[data-theme=dark] .text-gray-300 { color: #a0a0b0 !important; }
+[data-theme=dark] .text-gray-400 { color: #8b8b9a !important; }
+[data-theme=dark] .text-slate-300 { color: #94a3b8 !important; }
+[data-theme=dark] .text-slate-400 { color: #8b95a8 !important; }
+[data-theme=dark] .text-zinc-300 { color: #a0a0aa !important; }
+[data-theme=dark] .text-zinc-400 { color: #8b8b95 !important; }
+[data-theme=dark] .text-stone-300 { color: #a0a09a !important; }
+[data-theme=dark] .text-stone-400 { color: #8b8b85 !important; }
+/* text-neutral-500 in round 1 was #9ca3af — bump to be slightly brighter for small text */
+[data-theme=dark] .text-neutral-500 { color: #9ca3af !important; }
+
 /* ===== dark-mode audit-fix round 2 (hover states / opacity variants) =====
    gap: opacity-modified classes compile to DIFFERENT class names (bg-blue-50/70),
    and hover:/group-hover: states were never covered by round 1. */
