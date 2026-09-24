@@ -98,6 +98,44 @@
   [data-theme="dark"] .hover\:bg-neutral-200:hover {
     background-color: #333947 !important;
   }
+
+  /* ---- 补齐未覆盖的浅色底（浅字压浅底 = 看不见，故必须翻深）---- */
+  [data-theme="dark"] .bg-amber-50 { background-color: #4a3e0d !important; }
+  [data-theme="dark"] .bg-amber-100 { background-color: #493d0e !important; }
+  [data-theme="dark"] .bg-amber-200 { background-color: #493d0e !important; }
+  [data-theme="dark"] .bg-emerald-50 { background-color: #13442d !important; }
+  [data-theme="dark"] .bg-emerald-100 { background-color: #13442b !important; }
+  [data-theme="dark"] .bg-emerald-200 { background-color: #14422d !important; }
+  [data-theme="dark"] .bg-green-50 { background-color: #144322 !important; }
+  [data-theme="dark"] .bg-green-100 { background-color: #124523 !important; }
+  [data-theme="dark"] .bg-teal-50 { background-color: #144338 !important; }
+  [data-theme="dark"] .bg-teal-100 { background-color: #11453a !important; }
+  [data-theme="dark"] .bg-rose-50 { background-color: #4a0d11 !important; }
+  [data-theme="dark"] .bg-rose-100 { background-color: #4a0d12 !important; }
+  [data-theme="dark"] .bg-rose-200 { background-color: #490e15 !important; }
+  [data-theme="dark"] .bg-red-50 { background-color: #451111 !important; }
+  [data-theme="dark"] .bg-red-100 { background-color: #480f0f !important; }
+  [data-theme="dark"] .bg-red-200 { background-color: #490e0e !important; }
+  [data-theme="dark"] .bg-purple-50 { background-color: #2b0d4a !important; }
+  [data-theme="dark"] .bg-purple-100 { background-color: #2a0d4a !important; }
+  [data-theme="dark"] .bg-purple-200 { background-color: #2a0d4a !important; }
+  [data-theme="dark"] .bg-indigo-50 { background-color: #0d1b4a !important; }
+  [data-theme="dark"] .bg-indigo-100 { background-color: #0d1b4a !important; }
+  [data-theme="dark"] .bg-sky-50 { background-color: #0d314a !important; }
+  [data-theme="dark"] .bg-sky-100 { background-color: #0f3148 !important; }
+  [data-theme="dark"] .bg-yellow-50 { background-color: #474210 !important; }
+  [data-theme="dark"] .bg-yellow-100 { background-color: #49440e !important; }
+  [data-theme="dark"] .bg-orange-50 { background-color: #4a2f0d !important; }
+  [data-theme="dark"] .bg-orange-100 { background-color: #4a300d !important; }
+  [data-theme="dark"] .bg-\[\#f1efe8\] { background-color: #332f24 !important; }
+  [data-theme="dark"] .bg-\[\#fdf2f2\] { background-color: #421515 !important; }
+  [data-theme="dark"] .bg-\[\#f0fdf4\] { background-color: #144322 !important; }
+  [data-theme="dark"] .bg-\[\#e6e3da\] { background-color: #312e25 !important; }
+
+  /* 其余硬编码深字（不在 ink 家族里）在深底上同样会看不见，一并翻浅 */
+  [data-theme="dark"] .text-\[\#334155\] { color: #cbd5e1 !important; }
+  [data-theme="dark"] .text-\[\#b91c1c\] { color: #fca5a5 !important; }
+  [data-theme="dark"] .text-\[\#be123c\] { color: #fda4af !important; }
 }
 
 .font-serif-cormorant {
