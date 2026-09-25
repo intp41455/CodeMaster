@@ -74,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
   // themeButton removed — dark mode disabled
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-[rgba(26,26,26,0.08)] bg-[#f8f7f4]/95 backdrop-blur-md">
+    <header data-app-version="2026.09.25-login" className="sticky top-0 z-40 w-full border-b border-[rgba(26,26,26,0.08)] bg-[#f8f7f4]/95 backdrop-blur-md">
       <div className="mx-auto flex h-[60px] w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo & Name */}
         <div className="flex min-w-0 items-center gap-4">
