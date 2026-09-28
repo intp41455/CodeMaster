@@ -38,6 +38,19 @@ CodeMaster 是一所面向**完全零基础**学习者的交互式编程学院�
 
 平台由 **13 条学习赛道、35 节课程、51 个自动判定的检查点、5 道每日挑战、2 个真实开源项目拆解实验室、2 个代码事故复盘案例、1 个毕业项目**构成，全部内容均为中文原创。
 
+## 🖼️ 界面一览
+
+![CodeMaster 首页](docs/screenshots/cm-01-home.png)
+
+*CodeMaster 首页 · 13 条赛道入口*
+
+![CodeMaster 手机端](docs/screenshots/cm-02-mobile.png)
+
+*手机端同样完整可用*
+
+> 完整功能说明见姊妹项目：[intp41455/codepath · docs/使用文档.md](https://github.com/intp41455/codepath/blob/main/docs/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md) · 在线文档站：[codepath-docs.pages.dev](https://codepath-docs.pages.dev/)
+
+
 ## 核心模块
 
 | 模块 | 定位 | 关键能力 |
